@@ -126,7 +126,8 @@ src/ui.js        按钮与面板（原生 DOM，无 CSS module，无 JSX）
 scripts/build-client.mjs   把 src/* 内联成 __ModuleLoader__ 产物
 scripts/preview.mjs        生成样例 HTML（人工看版式）
 scripts/verify-browser.mjs 无桌面端跑真浏览器链路（生成 harness → Chrome 取证）
-test/smoke.mjs   Host 半冒烟测试（37 条断言）
+test/smoke.mjs   Host 半冒烟测试（45 条断言）
+test/client-unit.mjs 客户端纯函数单测（22 条：高度上限边界、回合类型判定）
 ```
 
 ### 为什么不用打包器
@@ -143,7 +144,7 @@ window.__ModuleLoader__.load({ id: "dsh-longshot", factory: (require) => { ... }
 
 ```bash
 npm run build     # src/* → lib/client.js
-npm test          # Host 半冒烟（37 条断言）
+npm test          # 45 条 Host 冒烟 + 22 条客户端纯函数断言
 npm run check     # 语法检查
 ```
 

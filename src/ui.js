@@ -560,3 +560,9 @@ function openPanel(sessionId, currentText) {
 
 exports.apply = apply
 exports.inject = ['slots']
+
+/**
+ * 仅供测试：把不依赖 DOM 的纯函数暴露出来，供 test/client-unit.mjs 在 Node 里单测。
+ * 运行时不会有人读这个字段。
+ */
+exports.__test = { planStageHeight, isBackground, KIND_META }

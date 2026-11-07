@@ -74,6 +74,41 @@ const SESSION = {
   ],
 }
 
+/**
+ * 边界样例：只用来压回合分类与工具名收敛，不参与渲染断言。
+ * 期望分类：user / (跳过纯工具) / step / context / context / answer
+ */
+const SESSION_EDGE = {
+  session: { id: 'session-edge-0002', title: '分类边界', createdAt: Date.UTC(2026, 10, 7, 1, 0, 0) },
+  events: [
+    // 1. 句中提到 system-reminder，但不在开头 → 仍是真实用户输入
+    { type: 'user/message', time: 1, seq: 1, data: { content: [{ type: 'text', text: '我写的文档里提到 <system-reminder> 这个词，这是什么？' }] } },
+    // 2. 纯工具步骤（没有正文）→ 不成行
+    { type: 'assistant/message', time: 2, seq: 2, data: { message: { content: [{ type: 'reasoning', text: '想一想' }, { type: 'tool-call', id: 'c1', name: 'grep', arguments: '{}' }] } } },
+    // 3. 正文 + 三个工具调用（含重复）→ step，工具名去重后最多 4 个
+    {
+      type: 'assistant/message',
+      time: 3,
+      seq: 3,
+      data: {
+        message: {
+          content: [
+            { type: 'text', text: '先搜一下，再跑一遍。' },
+            { type: 'tool-call', id: 'c2', name: 'grep', arguments: '{}' },
+            { type: 'tool-call', id: 'c3', name: 'grep', arguments: '{}' },
+            { type: 'tool-call', id: 'c4', name: 'pwsh', arguments: '{}' },
+          ],
+        },
+      },
+    },
+    // 4/5. 两种注入开头 → context
+    { type: 'user/message', time: 4, seq: 4, data: { content: [{ type: 'text', text: 'Current runtime context. This snapshot supersedes earlier ones.' }] } },
+    { type: 'user/message', time: 5, seq: 5, data: { content: [{ type: 'text', text: 'Time sampled while preparing turn 3, step 1: 2026-11-07T06:00:00+08:00' }] } },
+    // 6. 纯正文 → answer
+    { type: 'assistant/message', time: 6, seq: 6, data: { message: { content: [{ type: 'text', text: '这是最终答案。' }] } } },
+  ],
+}
+
 let handler
 const ctx = {
   effect: (fn) => {
@@ -88,9 +123,11 @@ const ctx = {
   },
   sessionQuery: {
     readSession: async (id) => {
-      if (id !== SESSION.session.id)
-        throw new Error('session not found')
-      return SESSION
+      if (id === SESSION.session.id)
+        return SESSION
+      if (id === SESSION_EDGE.session.id)
+        return SESSION_EDGE
+      throw new Error('session not found')
     },
   },
   logger: { warn: () => {} },
@@ -201,6 +238,21 @@ const bogus = await call('POST', '/longshot/render', { sessionId: SESSION.sessio
 check('越界下标 400', bogus.status === 400)
 const oneOutOfRange = await call('POST', '/longshot/render', { sessionId: SESSION.session.id, turns: [0, 99] })
 check('越界下标被忽略、其余照导', oneOutOfRange.status === 200 && oneOutOfRange.json?.stats?.turns === 1)
+
+// --- 分类边界（SESSION_EDGE）---
+const edge = await call('POST', '/longshot/turns', { sessionId: SESSION_EDGE.session.id })
+check('边界会话 turns 200', edge.status === 200, JSON.stringify(edge.json).slice(0, 160))
+const edgeTurns = edge.json?.turns ?? []
+check('纯工具步骤不单独成行（6 事件 → 5 回合）', edgeTurns.length === 5, String(edgeTurns.length))
+check('分类：user/step/context/context/answer',
+  edgeTurns.map((t) => t.kind).join(',') === 'user,step,context,context,answer',
+  edgeTurns.map((t) => t.kind).join(','))
+check('句中提到 system-reminder 不算注入', edgeTurns[0]?.kind === 'user')
+check('工具名去重且保留顺序', JSON.stringify(edgeTurns[1]?.tools) === '["grep","pwsh"]', JSON.stringify(edgeTurns[1]?.tools))
+check('纯工具步骤的 tool-call 不串到上一条（上一条是 user）', JSON.stringify(edgeTurns[0]?.tools) === '[]')
+const edgeRender = await call('POST', '/longshot/render', { sessionId: SESSION_EDGE.session.id, turns: [0, 4] })
+check('边界会话按正文导 2 条', edgeRender.status === 200 && edgeRender.json?.stats?.turns === 2)
+check('边界会话文件名带范围', String(edgeRender.json?.fileName ?? '').includes('选中2条'))
 
 // --- 错误路径 ---
 const missing = await call('POST', '/longshot/render', { sessionId: 'nope' })

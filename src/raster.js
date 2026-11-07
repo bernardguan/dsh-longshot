@@ -39,6 +39,18 @@ const MAX_TOTAL_CSS_HEIGHT = 200_000;
 /** 旧路径单 canvas 高度上限（无 CompressionStream 环境的降级截断）。 */
 const LEGACY_MAX_HEIGHT = 16000;
 /**
+ * 由内容实际高度推导出光栅高度与截断标志。
+ *
+ * 抽成纯函数是为了能在 Node 里单测边界（200000 / 200001 这类值不值得
+ * 起一个真浏览器跑 400k 像素高的 PNG 才能验证）。
+ * @param fullHeight 内容实际高度（CSS px，向上取整后的值）。
+ * @returns 光栅使用的高度，以及是否被产品上限截断。
+ */
+function planStageHeight(fullHeight) {
+  const height = Math.max(1, Math.min(fullHeight, MAX_TOTAL_CSS_HEIGHT));
+  return { height, truncated: fullHeight > MAX_TOTAL_CSS_HEIGHT };
+}
+/**
  * 单步光栅/编码操作超时（毫秒）：img.decode()、canvas.toBlob 与
  * CompressionStream 读写依赖宿主回调，个别环境（如离屏 canvas 被回收、
  * 压缩流内部错误未传播）会永不结算——没有兜底则导出按钮永久转圈、
@@ -219,10 +231,10 @@ class RasterStage {
             // 等待内联图片完成布局沉淀。
             await new Promise((resolve) => setTimeout(resolve, 60));
             const fullHeight = Math.ceil(stage.scrollHeight);
-            const totalHeight = Math.max(1, Math.min(fullHeight, MAX_TOTAL_CSS_HEIGHT));
-            if (fullHeight > MAX_TOTAL_CSS_HEIGHT)
+            const plan = planStageHeight(fullHeight);
+            if (plan.truncated)
                 options?.onTruncated?.();
-            return new RasterStage(stage, totalHeight, fullHeight > MAX_TOTAL_CSS_HEIGHT, width);
+            return new RasterStage(stage, plan.height, plan.truncated, width);
         }
         catch (error) {
             stage.remove();

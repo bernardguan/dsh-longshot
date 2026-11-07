@@ -3,6 +3,19 @@
 本项目从 1.0.0 起按 [Semantic Versioning](https://semver.org/lang/zh-CN/) 记版本；
 破坏性变更（dsh 侧 API 变动、配置字段改名）会在小版本号里明确标出。
 
+## 1.0.1
+
+测试补强，行为无变化。
+
+- 长图高度上限的逻辑抽成纯函数 `planStageHeight()`，可在 Node 里单测 200000 / 200001 这类边界，
+  不必为了验证截断真去跑一张 40 万像素高的 PNG。
+- 新增 `test/client-unit.mjs`：22 条断言，覆盖高度上限与截断标志、回合类型判定、
+  以及 bundle 契约（`inject`、`apply`、`__ModuleLoader__` 注册 id）。
+- 冒烟测试扩到 45 条：新增「分类边界」样例会话，覆盖
+  纯工具步骤不成行、工具名去重、句中提及 `system-reminder` 不算注入、
+  `Current runtime context.` 与 `Time sampled while preparing turn` 判定为上下文。
+- bundle 新增只读测试钩子 `exports.__test`（运行时不使用）。
+
 ## 1.0.0
 
 首个公开版本。功能与 0.3.0 一致，补齐了发布所需的东西：`LICENSE`、第三方代码声明、

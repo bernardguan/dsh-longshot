@@ -1,6 +1,6 @@
 {
   "name": "dsh-longshot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Export selected DSH conversation turns as a single long PNG. Client-side tiled canvas rasterization, no print dialog, no CSS-module build step.",
   "license": "MIT",
   "type": "module",
@@ -38,7 +38,7 @@
   },
   "scripts": {
     "build": "node scripts/build-client.mjs",
-    "test": "node test/smoke.mjs",
+    "test": "node test/smoke.mjs && node test/client-unit.mjs",
     "check": "node --check lib/index.js && node --check lib/client.js && node --check src/ui.js"
   },
   "dsh": {
