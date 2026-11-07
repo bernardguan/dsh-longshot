@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.19.0
+      - name: 语法检查（Host 半 / 客户端 bundle / UI 源）
+        run: npm run check
+      - name: 构建产物与源码一致（改过 src 却忘记 pnpm build 会让 CI 红）
+        run: |
+          npm run build
+          test -z "$(git status --porcelain lib/client.js)" || {
+            echo '::error file=lib/client.js::lib/client.js 与 src/ 不一致，请本地执行 npm run build 并提交产物';
+            exit 1;
+          }
+      - name: Host 半冒烟（37 条断言）
+        run: npm test

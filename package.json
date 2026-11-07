@@ -1,0 +1,61 @@
+{
+  "name": "dsh-longshot",
+  "version": "1.0.0",
+  "description": "Export selected DSH conversation turns as a single long PNG. Client-side tiled canvas rasterization, no print dialog, no CSS-module build step.",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "src",
+    "scripts",
+    "test",
+    "cordis.patch.yml",
+    "README.md",
+    "README.en.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "long-image",
+    "screenshot",
+    "png",
+    "export",
+    "canvas"
+  ],
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "build": "node scripts/build-client.mjs",
+    "test": "node test/smoke.mjs",
+    "check": "node --check lib/index.js && node --check lib/client.js && node --check src/ui.js"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": []
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bernardguan/dsh-longshot.git"
+  },
+  "homepage": "https://github.com/bernardguan/dsh-longshot#readme",
+  "bugs": {
+    "url": "https://github.com/bernardguan/dsh-longshot/issues"
+  }
+}

@@ -1,0 +1,10 @@
+# dsh-longshot —— bundle patch 层
+#
+# 当本包出现在某个 profile 的 `dsh.profile.bundles` 列表里时，这一层会被应用，
+# 从而在 loader 树中插入下面这行插件。
+#
+# 手工安装（不走插件市场）时，也可以把下面这段 insert 直接抄进：
+#   ~/.dsh/profiles/<profile>/cordis.patch.yml
+- insert:
+    - id: longshot
+      name: dsh-longshot
