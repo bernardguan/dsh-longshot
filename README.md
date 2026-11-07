@@ -54,9 +54,13 @@ DSH 生态里已有的长图实现（`dsh-companion` 的「PNG 长图」）在�
 
 要求：DSH `@deepseek-ai/dsh` **0.2.1-rc.2** 及以上（实测于 Engineer Workbench 2.0.18），Node ≥ 22.19（宿主自带）。
 
-### 方式一：插件市场
+### 方式一：插件市场（尚未收录）
 
-在 DSH 的 插件市场 里搜索 `longshot` 安装并重启。
+目前还没提交到任何市场索引，请用方式二或三。若你的 DSH 带 `dshmarket`，可以直接把它当普通 bundle 装：
+
+```bash
+dsh plugin add https://github.com/bernardguan/dsh-longshot --profile <profile>
+```
 
 ### 方式二：命令行
 
