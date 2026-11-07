@@ -1,0 +1,36 @@
+name: Feature request
+description: 希望多导什么、多支持什么格式
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 你想解决什么问题
+      description: 描述场景，而不是直接给方案——场景能让我判断有没有更省事的做法
+      placeholder: 例如：我要把一次排障过程发到群里，但现在只能导出全部回合，太长了
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 你希望的做法（可选）
+      placeholder: 例如：支持按轮次折叠后台步骤
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: 影响范围
+      options:
+        - 长图版式 / 视觉
+        - 回合选择与分类
+        - 导出能力（格式、宽度、脱敏）
+        - 安装与兼容性
+        - 其他
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        > 本项目刻意保持「零运行时依赖 + 无打包器」，涉及引入构建链的方案会先开 issue 讨论再动手。

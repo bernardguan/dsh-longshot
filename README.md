@@ -146,7 +146,11 @@ window.__ModuleLoader__.load({ id: "dsh-longshot", factory: (require) => { ... }
 npm run build     # src/* → lib/client.js
 npm test          # 45 条 Host 冒烟 + 22 条客户端纯函数断言
 npm run check     # 语法检查
+node scripts/release.mjs patch "修了 xxx"   # 一键发版（不自动 push）
 ```
+
+维护流程（分支、发版、issue 处理、回滚、dsh 升级巡检）见 **[docs/MAINTENANCE.md](docs/MAINTENANCE.md)**；
+在本仓库工作的 AI 会话请先读 **[AGENTS.md](AGENTS.md)**。
 
 如果本机只有 DSH 桌面版、没有独立 Node，可以用 Electron 自带的 Node：
 

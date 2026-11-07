@@ -1,0 +1,70 @@
+name: Bug report
+description: 面板报错、按钮不出现、导出的图不对
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        先跑三个自查，能省一轮来回：
+        1. `%TEMP%\dsh-longshot.mounted` 是否存在、内容里的版本号是多少（证明 Host 半有没有挂上）；
+        2. `GET /longshot/ping` 是否返回 `{ ok: true, version: ... }`；
+        3. F12 控制台有没有报错（尤其 `Failed to fetch dynamically imported module`）。
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: 插件版本
+      description: `/longshot/ping` 返回的 version，或面板标题旁的版本
+      placeholder: 1.0.1
+    validations:
+      required: true
+
+  - type: input
+    id: dsh-version
+    attributes:
+      label: DSH / Engineer Workbench 版本
+      placeholder: Engineer Workbench 2.0.18（dsh 0.2.1-rc.2）
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+      placeholder: |
+        1. 打开某个会话
+        2. 点某条助手消息下的「长图」
+        3. 勾选 3 条，点导出
+        4. ……
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期望行为
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际行为
+      description: 有截图 / 控制台报错 / 接口返回就贴上来
+    validations:
+      required: true
+
+  - type: textarea
+    id: console
+    attributes:
+      label: 控制台或宿主日志
+      description: F12 → Console，或 `%APPDATA%\Engineer Workbench\logs\host\dsh-*.log` 里的相关行
+      render: text
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: 确认
+      options:
+        - label: 我确认这不是「还没重启应用」导致的（改了插件后必须重启宿主）
+        - label: 我搜索过现有 issue
